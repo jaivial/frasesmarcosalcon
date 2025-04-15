@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcome-screen">
+        <div class="welcome-content">
+            <div class="welcome-ornament">❧</div>
+            <h1 class="welcome-title">{{ .Title }}</h1>
+            <div class="welcome-author">POR MARCOS ALCÓN</div>
+            <p class="welcome-description">Bienvenido a esta experiencia de lectura interactiva. Este libro digital le permite navegar a través de una colección de frases escogidas con una interfaz elegante que simula la experiencia de leer un libro físico.</p>
+            <button class="start-btn" id="start-btn">COMENZAR A LEER</button>
+            <div class="welcome-ornament">❦</div>
+        </div>
+    </div>
+
+    <!-- Book Container -->
+    <div class="book-container hidden">
+        <div class="book" id="book">
+            <!-- Pages will be added by JavaScript -->
+        </div>
+        
+        <!-- Navigation Controls -->
+        <div class="navigation">
+            <div class="nav-btn" id="prev-btn"><i class="fas fa-chevron-left"></i></div>
+            <div class="nav-text" id="page-counter">Página 1</div>
+            <div class="nav-btn" id="next-btn"><i class="fas fa-chevron-right"></i></div>
+        </div>
+        
+        <!-- Page Turn Effect -->
+        <div class="page-turn-effect" id="page-turn-effect"></div>
+    </div>
+
+    <!-- Instead of directly embedding the data, fetch it from API -->
+    <script src="/static/js/book.js"></script>
+</body>
+</html> 

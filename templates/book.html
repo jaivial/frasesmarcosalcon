@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/booklet.css">
+    <style>
+        .home-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 10000;
+            background: #c8a76c;
+            border: 2px solid #8b4513;
+            color: #2c2416;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+        
+        .home-button:hover {
+            background: #8b4513;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .home-button i {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Button (Top Left) -->
+    <a href="/" class="home-button">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+    </a>
+    
+    <!-- Welcome/Loading Screen -->
+    <div class="welcome-screen" id="welcome-screen">
+        <div class="welcome-content">
+            <div class="loading-ornament">❧</div>
+            <h2 class="loading-title">Cargando libro</h2>
+            <div class="loading-indicator">
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-text">Preparando su experiencia de lectura...</div>
+            <div class="loading-ornament">❦</div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="book-container">
+        <!-- Single recyclable page element -->
+        <div class="page" id="current-page">
+            <!-- This content will be dynamically replaced -->
+            <div class="book-page left-page" id="left-page">
+                <div class="page-content">
+                    <!-- Left page content will be inserted here -->
+                </div>
+            </div>
+            <div class="book-page right-page" id="right-page">
+                <div class="page-content">
+                    <!-- Right page content will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="navigation">
+            <button id="prev-btn" class="nav-button"><i class="fas fa-chevron-left"></i> Anterior</button>
+            <span id="page-indicator">Página 1 de n</span>
+            <button id="next-btn" class="nav-button">Siguiente <i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <!-- Return to home link -->
+        <div class="home-link">
+            <a href="/" title="Volver a la página principal"><i class="fas fa-home"></i> Volver al inicio</a>
+        </div>
+    </div>
+
+    <!-- Templates for page content -->
+    <template id="title-page-template">
+        <div class="title-page">
+            <div class="title-ornament">❧</div>
+            <div class="title-frame">
+                <h1 class="title">{{ .Title }}</h1>
+            </div>
+            <div class="author">POR MARCOS ALCÓN</div>
+            <div class="year">MMXXIII</div>
+            <div class="title-ornament">❦</div>
+            
+            <div class="border-design"></div>
+            <div class="inner-border"></div>
+            <div class="decorative-line top-line"></div>
+            <div class="decorative-line bottom-line"></div>
+            <div class="corner-ornament corner-tl"></div>
+            <div class="corner-ornament corner-tr"></div>
+            <div class="corner-ornament corner-bl"></div>
+            <div class="corner-ornament corner-br"></div>
+        </div>
+    </template>
+
+    <template id="intro-page-template">
+        <div class="intro-text">
+            <p>Bienvenido a esta colección de frases escogidas por Marcos Alcón. Cada una de ellas representa un pensamiento profundo, una reflexión sobre la vida o una sabiduría perdurable.</p>
+            <p>Este libro digital le permite recorrer estas frases en un formato que simula la experiencia de un libro físico, con una presentación elegante y clásica.</p>
+            <p>Disfrute de la lectura y permita que estas palabras le inspiren.</p>
+        </div>
+        
+        <div class="border-design"></div>
+        <div class="inner-border"></div>
+        <div class="decorative-line top-line"></div>
+        <div class="decorative-line bottom-line"></div>
+        <div class="corner-ornament corner-tl"></div>
+        <div class="corner-ornament corner-tr"></div>
+        <div class="corner-ornament corner-bl"></div>
+        <div class="corner-ornament corner-br"></div>
+        <div class="page-number">i</div>
+    </template>
+
+    <template id="phrase-page-template">
+        <div class="phrase-container">
+            <div class="phrase"><span class="phrase-number">0</span> Placeholder text</div>
+        </div>
+        <div class="page-number">0</div>
+        
+        <div class="border-design"></div>
+        <div class="inner-border"></div>
+        <div class="decorative-line top-line"></div>
+        <div class="decorative-line bottom-line"></div>
+        <div class="corner-ornament corner-tl"></div>
+        <div class="corner-ornament corner-tr"></div>
+        <div class="corner-ornament corner-bl"></div>
+        <div class="corner-ornament corner-br"></div>
+    </template>
+
+    <template id="empty-page-template">
+        <div class="phrase-container empty-phrase">
+            <div class="ornament-center">❦</div>
+        </div>
+        <div class="page-number">0</div>
+        
+        <div class="border-design"></div>
+        <div class="inner-border"></div>
+        <div class="decorative-line top-line"></div>
+        <div class="decorative-line bottom-line"></div>
+        <div class="corner-ornament corner-tl"></div>
+        <div class="corner-ornament corner-tr"></div>
+        <div class="corner-ornament corner-bl"></div>
+        <div class="corner-ornament corner-br"></div>
+    </template>
+
+    <template id="last-page-template">
+        <div class="final-page">
+            <div class="title-ornament">❧</div>
+            <h2 class="final-title">Fin del Libro</h2>
+            <p class="final-text">Gracias por leer esta colección de frases de Marcos Alcón.</p>
+            <a href="/" class="final-button">
+                <i class="fas fa-home"></i> Volver al inicio
+            </a>
+            <div class="title-ornament">❦</div>
+            
+            <div class="border-design"></div>
+            <div class="inner-border"></div>
+            <div class="decorative-line top-line"></div>
+            <div class="decorative-line bottom-line"></div>
+            <div class="corner-ornament corner-tl"></div>
+            <div class="corner-ornament corner-tr"></div>
+            <div class="corner-ornament corner-bl"></div>
+            <div class="corner-ornament corner-br"></div>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // References
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const bookContainer = document.getElementById('book-container');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const pageIndicator = document.getElementById('page-indicator');
+            const currentPage = document.getElementById('current-page');
+            const leftPageContent = document.querySelector('#left-page .page-content');
+            const rightPageContent = document.querySelector('#right-page .page-content');
+            
+            // Templates
+            const titlePageTemplate = document.getElementById('title-page-template');
+            const introPageTemplate = document.getElementById('intro-page-template');
+            const phrasePageTemplate = document.getElementById('phrase-page-template');
+            const emptyPageTemplate = document.getElementById('empty-page-template');
+            const lastPageTemplate = document.getElementById('last-page-template');
+            
+            // Book state
+            let currentSpread = 0; // Current 2-page spread (0 = title page)
+            let totalSpreads = 0;  // Total number of 2-page spreads
+            let isLoading = true;
+            let isTransitioning = false;
+            let phrases = [];
+            
+            // Fetch phrases from API
+            fetch('/api/phrases')
+                .then(response => response.json())
+                .then(data => {
+                    // Sort phrases by number to ensure correct ordering
+                    phrases = data.Phrases.sort((a, b) => a.Number - b.Number);
+                    
+                    // Calculate total spreads
+                    totalSpreads = Math.ceil(phrases.length / 2) + 2; // Phrase spreads + title spread + final spread
+                    
+                    // Show book after loading is complete
+                    setTimeout(() => {
+                        welcomeScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            welcomeScreen.style.display = 'none';
+                            bookContainer.classList.remove('hidden');
+                            bookContainer.style.opacity = '1';
+                            isLoading = false;
+                            
+                            // Render the first spread (title page)
+                            renderCurrentSpread();
+                            
+                            // Update page indicator
+                            updatePageIndicator();
+                        }, 500);
+                    }, 800);
+                })
+                .catch(error => {
+                    console.error('Error fetching book data:', error);
+                    // Show error message to user
+                    document.querySelector('.loading-text').textContent = 'Error cargando el libro. Por favor, recargue la página.';
+                });
+            
+            // Render the current spread (2 pages)
+            function renderCurrentSpread() {
+                if (currentSpread === 0) {
+                    // Title spread
+                    renderTitleSpread();
+                } else if (currentSpread === totalSpreads - 1) {
+                    // Final page spread
+                    renderFinalSpread();
+                } else {
+                    // Phrase spread
+                    renderPhraseSpread(currentSpread);
+                }
+            }
+            
+            // Render the title spread (first and second pages)
+            function renderTitleSpread() {
+                // Clear current content
+                leftPageContent.innerHTML = '';
+                rightPageContent.innerHTML = '';
+                
+                // Add title page content to left page
+                const titleContent = document.importNode(titlePageTemplate.content, true);
+                leftPageContent.appendChild(titleContent);
+                
+                // Add intro content to right page
+                const introContent = document.importNode(introPageTemplate.content, true);
+                rightPageContent.appendChild(introContent);
+            }
+            
+            // Render the final spread
+            function renderFinalSpread() {
+                // Clear current content
+                leftPageContent.innerHTML = '';
+                rightPageContent.innerHTML = '';
+                
+                // Get the last phrase index
+                const lastPhraseIndex = phrases.length - 1;
+                
+                // If phrases.length is even, the last page is on the right
+                // If phrases.length is odd, the last page is on the left
+                if (phrases.length % 2 === 0) {
+                    // Last phrase on the left, final page on the right
+                    const leftContent = document.importNode(phrasePageTemplate.content, true);
+                    const phraseElem = leftContent.querySelector('.phrase');
+                    const numberElem = leftContent.querySelector('.phrase-number');
+                    const pageNumberElem = leftContent.querySelector('.page-number');
+                    
+                    const phrase = phrases[lastPhraseIndex];
+                    numberElem.textContent = phrase.Number + '.';
+                    phraseElem.innerHTML = `<span class="phrase-number">${phrase.Number}.</span> ${phrase.Text}`;
+                    pageNumberElem.textContent = (lastPhraseIndex * 2) + 1;
+                    
+                    leftPageContent.appendChild(leftContent);
+                    
+                    // Final page on the right
+                    const rightContent = document.importNode(lastPageTemplate.content, true);
+                    rightPageContent.appendChild(rightContent);
+                } else {
+                    // Empty page on the left
+                    const emptyContent = document.importNode(emptyPageTemplate.content, true);
+                    leftPageContent.appendChild(emptyContent);
+                    
+                    // Final page on the right
+                    const rightContent = document.importNode(lastPageTemplate.content, true);
+                    rightPageContent.appendChild(rightContent);
+                }
+            }
+            
+            // Render a phrase spread (two phrases per spread)
+            function renderPhraseSpread(spreadIndex) {
+                // Calculate which phrases to show
+                const firstPhraseIndex = (spreadIndex - 1) * 2;
+                const secondPhraseIndex = firstPhraseIndex + 1;
+                
+                // Clear current content
+                leftPageContent.innerHTML = '';
+                rightPageContent.innerHTML = '';
+                
+                // Left page - always has content for valid spreadIndex
+                if (firstPhraseIndex < phrases.length) {
+                    const leftContent = document.importNode(phrasePageTemplate.content, true);
+                    const phraseElem = leftContent.querySelector('.phrase');
+                    const numberElem = leftContent.querySelector('.phrase-number');
+                    const pageNumberElem = leftContent.querySelector('.page-number');
+                    
+                    const phrase = phrases[firstPhraseIndex];
+                    numberElem.textContent = phrase.Number + '.';
+                    phraseElem.innerHTML = `<span class="phrase-number">${phrase.Number}.</span> ${phrase.Text}`;
+                    pageNumberElem.textContent = (firstPhraseIndex * 2) + 1;
+                    
+                    leftPageContent.appendChild(leftContent);
+                }
+                
+                // Right page - may be empty if odd number of phrases
+                if (secondPhraseIndex < phrases.length) {
+                    const rightContent = document.importNode(phrasePageTemplate.content, true);
+                    const phraseElem = rightContent.querySelector('.phrase');
+                    const numberElem = rightContent.querySelector('.phrase-number');
+                    const pageNumberElem = rightContent.querySelector('.page-number');
+                    
+                    const phrase = phrases[secondPhraseIndex];
+                    numberElem.textContent = phrase.Number + '.';
+                    phraseElem.innerHTML = `<span class="phrase-number">${phrase.Number}.</span> ${phrase.Text}`;
+                    pageNumberElem.textContent = (secondPhraseIndex * 2) + 2;
+                    
+                    rightPageContent.appendChild(rightContent);
+                } else {
+                    // Empty right page
+                    const emptyContent = document.importNode(emptyPageTemplate.content, true);
+                    const pageNumberElem = emptyContent.querySelector('.page-number');
+                    pageNumberElem.textContent = (firstPhraseIndex * 2) + 2;
+                    
+                    rightPageContent.appendChild(emptyContent);
+                }
+            }
+            
+            // Update page indicator
+            function updatePageIndicator() {
+                // Calculate actual page numbers (each spread = 2 pages)
+                const currentPageNumber = currentSpread * 2 + 1; // +1 because we want to start from page 1
+                const totalPages = totalSpreads * 2;
+                
+                pageIndicator.textContent = `Página ${currentPageNumber}-${currentPageNumber+1} de ${totalPages}`;
+            }
+            
+            // Navigate to next spread
+            function goToNextSpread() {
+                if (isLoading || isTransitioning || currentSpread >= totalSpreads - 1) return;
+                
+                isTransitioning = true;
+                
+                // Add transition class
+                currentPage.classList.add('page-transitioning');
+                currentPage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Increment spread counter
+                    currentSpread++;
+                    
+                    // Render the new content
+                    renderCurrentSpread();
+                    
+                    // Force reflow
+                    void currentPage.offsetWidth;
+                    
+                    // Fade in
+                    currentPage.style.opacity = '1';
+                    
+                    // Update page indicator
+                    updatePageIndicator();
+                    
+                    // End transition lock
+                    setTimeout(() => {
+                        currentPage.classList.remove('page-transitioning');
+                        isTransitioning = false;
+                    }, 250);
+                }, 250);
+            }
+            
+            // Navigate to previous spread
+            function goToPrevSpread() {
+                if (isLoading || isTransitioning || currentSpread <= 0) return;
+                
+                isTransitioning = true;
+                
+                // Add transition class
+                currentPage.classList.add('page-transitioning');
+                currentPage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Decrement spread counter
+                    currentSpread--;
+                    
+                    // Render the new content
+                    renderCurrentSpread();
+                    
+                    // Force reflow
+                    void currentPage.offsetWidth;
+                    
+                    // Fade in
+                    currentPage.style.opacity = '1';
+                    
+                    // Update page indicator
+                    updatePageIndicator();
+                    
+                    // End transition lock
+                    setTimeout(() => {
+                        currentPage.classList.remove('page-transitioning');
+                        isTransitioning = false;
+                    }, 250);
+                }, 250);
+            }
+            
+            // Debounced event listeners to prevent rapid clicks
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function() {
+                        func.apply(context, args);
+                    }, wait);
+                };
+            }
+            
+            // Use debounced versions for event handlers
+            const debouncedNext = debounce(goToNextSpread, 100);
+            const debouncedPrev = debounce(goToPrevSpread, 100);
+            
+            // Event listeners
+            nextBtn.addEventListener('click', debouncedNext);
+            prevBtn.addEventListener('click', debouncedPrev);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    debouncedNext();
+                } else if (e.key === 'ArrowLeft') {
+                    debouncedPrev();
+                }
+            });
+            
+            // Add touch swipe support
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, false);
+            
+            document.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const horizontalDistance = Math.abs(touchEndX - touchStartX);
+                const verticalDistance = Math.abs(touchEndY - touchStartY);
+                
+                if (horizontalDistance > verticalDistance && horizontalDistance > swipeThreshold) {
+                    if (touchEndX < touchStartX) {
+                        // Left swipe
+                        debouncedNext();
+                    } else {
+                        // Right swipe
+                        debouncedPrev();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

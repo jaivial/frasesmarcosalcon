@@ -1,0 +1,377 @@
+/* Book container */
+.book-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 2000px;
+    transition: visibility 0.8s, opacity 0.8s;
+}
+
+/* Book */
+.book {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    transform-style: preserve-3d;
+    transform: rotateY(0deg);
+    transition: transform 0.5s;
+}
+
+/* Page */
+.page {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform 1s ease-in-out;
+    background: #f5e6d3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+}
+
+/* Page turning animations */
+.page.turning {
+    animation: turnPage 0.3s ease-in-out forwards;
+}
+
+.page.reverse-turning {
+    animation: turnPageReverse 0.3s ease-in-out forwards;
+}
+
+@keyframes turnPage {
+    0% {
+        transform: rotateY(0deg);
+    }
+    100% {
+        transform: rotateY(-180deg);
+    }
+}
+
+@keyframes turnPageReverse {
+    0% {
+        transform: rotateY(-180deg);
+    }
+    100% {
+        transform: rotateY(0deg);
+    }
+}
+
+/* Page content */
+.page-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #f5e6d3;
+    border-radius: 2px;
+}
+
+/* Title page specific styles */
+.title-page {
+    text-align: center;
+    padding: 20px;
+}
+
+.title-frame {
+    border: 2px solid #8b4513;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.title {
+    font-size: 2.5em;
+    color: #8b4513;
+    font-family: 'Playfair Display', serif;
+    margin: 20px 0;
+    line-height: 1.4;
+}
+
+.author {
+    font-size: 1.5em;
+    color: #8b4513;
+    margin: 20px 0;
+    font-family: 'Playfair Display', serif;
+}
+
+.year {
+    font-size: 1.2em;
+    color: #8b4513;
+    margin: 10px 0;
+    font-family: 'Playfair Display', serif;
+}
+
+.title-ornament {
+    font-size: 2em;
+    color: #8b4513;
+    margin: 20px 0;
+}
+
+/* Phrase container */
+.phrase-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+.phrase {
+    font-size: 1.4em;
+    line-height: 1.8;
+    color: #2c1810;
+    text-align: justify;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 20px;
+}
+
+.phrase-number {
+    font-weight: bold;
+    color: #8b4513;
+}
+
+/* Page number */
+.page-number {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    font-size: 1.2em;
+    color: #8b4513;
+    font-family: 'Playfair Display', serif;
+}
+
+/* Decorative elements */
+.background-texture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/static/images/paper-texture.png');
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.border-design {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    pointer-events: none;
+}
+
+.inner-border {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    right: 25px;
+    bottom: 25px;
+    border: 1px solid rgba(139, 69, 19, 0.2);
+    pointer-events: none;
+}
+
+.decorative-line {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    height: 1px;
+    background: rgba(139, 69, 19, 0.2);
+    pointer-events: none;
+}
+
+.top-line {
+    top: 40px;
+}
+
+.bottom-line {
+    bottom: 40px;
+}
+
+.corner-ornament {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    pointer-events: none;
+}
+
+.corner-tl {
+    top: 20px;
+    left: 20px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.corner-tr {
+    top: 20px;
+    right: 20px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.corner-bl {
+    bottom: 20px;
+    left: 20px;
+    border-right: none;
+    border-top: none;
+}
+
+.corner-br {
+    bottom: 20px;
+    right: 20px;
+    border-left: none;
+    border-top: none;
+}
+
+/* Navigation buttons */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #8b4513;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 1000;
+}
+
+.nav-btn:hover {
+    color: #5c2d0c;
+}
+
+#prev-btn {
+    left: 20px;
+}
+
+#next-btn {
+    right: 20px;
+}
+
+/* Page counter */
+#page-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Playfair Display', serif;
+    color: #8b4513;
+    font-size: 1em;
+}
+
+/* Page turn effect overlay */
+#page-turn-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+}
+
+@keyframes pageTurnEffect {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Welcome screen */
+#welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f5e6d3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.8s, transform 0.8s;
+}
+
+.welcome-content {
+    text-align: center;
+    padding: 20px;
+}
+
+#start-btn {
+    background: #8b4513;
+    color: #f5e6d3;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Playfair Display', serif;
+    border-radius: 5px;
+}
+
+#start-btn:hover {
+    background: #5c2d0c;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+    .book {
+        width: 90vw;
+        height: 80vh;
+    }
+
+    .phrase {
+        font-size: 1.2em;
+    }
+
+    .title {
+        font-size: 2em;
+    }
+
+    .author {
+        font-size: 1.2em;
+    }
+
+    .year {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 600px) {
+    .phrase {
+        font-size: 1em;
+    }
+
+    .title {
+        font-size: 1.5em;
+    }
+
+    .author {
+        font-size: 1em;
+    }
+
+    .year {
+        font-size: 0.9em;
+    }
+
+    .nav-btn {
+        font-size: 1.5em;
+    }
+} 
