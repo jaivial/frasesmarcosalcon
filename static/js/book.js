@@ -2,12 +2,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // References
     const welcomeScreen = document.getElementById('welcome-screen');
     const startBtn = document.getElementById('start-btn');
-    const book = document.getElementById('book');
+    const bookElement = document.getElementById('book');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const pageCounter = document.getElementById('page-counter');
-    const pageTurnEffect = document.getElementById('page-turn-effect');
     const bookContainer = document.querySelector('.book-container');
+    const homeBtn = document.getElementById('home-btn');
 
     // Initially hide the book container
     if (bookContainer) {
@@ -15,230 +15,235 @@ document.addEventListener('DOMContentLoaded', function () {
         bookContainer.style.opacity = '0';
     }
 
-    // Book state
-    let currentPage = 0;
-    let totalPages = 0;
-    let isAnimating = false;
-    let bookData = null;
-    let currentPageElement = null;
+    // Book initialization and configuration
+    let pageFlip = null;
 
-    // Fetch book data from JSON file
-    fetch('/static/data/poems.json')
-        .then(response => response.json())
-        .then(data => {
-            bookData = data;
-            console.log('Book data loaded:', bookData);
-            totalPages = bookData.poems.length + 1; // Add 1 for title page
-
-            // Create the single page element that will be reused
-            createPageElement();
-
-            // Initialize with the first page
-            renderCurrentPage();
-        })
-        .catch(error => {
-            console.error('Error fetching book data:', error);
+    // Initialize PageFlip with hardcoded pages
+    function initPageFlip() {
+        // Configure StPageFlip according to documentation
+        pageFlip = new St.PageFlip(bookElement, {
+            width: 400, // Base page width
+            height: 600, // Base page height
+            size: "stretch", // Stretch to fit container
+            minWidth: 250, // Smaller minimum width for mobile
+            minHeight: 350, // Smaller minimum height for mobile
+            maxWidth: 1500, // Larger maximum width for desktop
+            maxHeight: 2000, // Larger maximum height for desktop
+            showCover: false, // Changed to false to remove cover behavior
+            usePortrait: true,
+            autoSize: true, // Auto-size to container
+            drawShadow: true,
+            flippingTime: 1000,
+            useMouseEvents: true,
+            swipeDistance: 30,
+            clickEventForward: true,
+            mobileScrollSupport: true,
+            maxShadowOpacity: 0.5,
+            startPage: window.innerWidth > 768 ? 0 : 1 // Start showing blank page on desktop, title page on mobile
         });
 
-    // Create the single page element that will be reused
-    function createPageElement() {
-        currentPageElement = document.createElement('div');
-        currentPageElement.className = 'page';
-        book.appendChild(currentPageElement);
-    }
+        // Load pages from HTML as per documentation
+        pageFlip.loadFromHTML(document.querySelectorAll('.page'));
 
-    // Add common decorative elements to a page
-    function addDecorativeElements() {
-        return `
-            <div class="background-texture"></div>
-            <div class="border-design"></div>
-            <div class="inner-border"></div>
-            <div class="decorative-line top-line"></div>
-            <div class="decorative-line bottom-line"></div>
-            <div class="corner-ornament corner-tl"></div>
-            <div class="corner-ornament corner-tr"></div>
-            <div class="corner-ornament corner-bl"></div>
-            <div class="corner-ornament corner-br"></div>
-        `;
-    }
+        // Fix for positioning issue on smaller screens when turning the cover
+        if (window.innerWidth < 1003) {
+            // Add a specific event handler for page flipping start
+            pageFlip.on('flipping', (e) => {
+                // Keep book container position stable during flipping
+                bookContainer.style.transition = 'none';
+                bookContainer.style.transform = 'translateY(0)';
+            });
 
-    // Render the current page content
-    function renderCurrentPage() {
-        if (currentPage === 0) {
-            // Title page
-            currentPageElement.innerHTML = `
-                <div class="page-content page-front">
-                    <div class="title-page">
-                        <div class="title-ornament">❧</div>
-                        <div class="title-frame">
-                            <div class="title">${bookData.title}</div>
-                        </div>
-                        <div class="author">POR ${bookData.author}</div>
-                        <div class="title-ornament">❦</div>
-                    </div>
-                    ${addDecorativeElements()}
-                </div>
-            `;
+            // When flip is complete, ensure proper positioning
+            pageFlip.on('flip', (e) => {
+                // Reset any transform changes made during flipping
+                bookContainer.style.transition = 'transform 0.3s ease-out';
+                bookContainer.style.transform = '';
+
+                const currentPage = e.data + 1;
+                const totalPages = pageFlip.getPageCount();
+                updatePageCounter(currentPage, totalPages);
+            });
         } else {
-            // Poem page
-            const poem = bookData.poems[currentPage - 1];
-            const formattedPhrase = `<span class="phrase-number">${poem.number}.</span> ${poem.text}`;
-
-            currentPageElement.innerHTML = `
-                <div class="page-content page-front">
-                    <div class="phrase-container">
-                        <div class="phrase">${formattedPhrase}</div>
-                    </div>
-                    <div class="page-number">${currentPage}</div>
-                    ${addDecorativeElements()}
-                </div>
-            `;
+            // Regular flip event handler for larger screens
+            pageFlip.on('flip', (e) => {
+                const currentPage = e.data + 1;
+                const totalPages = pageFlip.getPageCount();
+                updatePageCounter(currentPage, totalPages);
+            });
         }
 
-        updatePageCounter();
-    }
-
-    // Turn to next page
-    function nextPage() {
-        if (currentPage < totalPages - 1 && !isAnimating) {
-            isAnimating = true;
-
-            // Add turning animation
-            currentPageElement.classList.add('turning');
-            playPageTurnEffect();
-
-            // Update content immediately but hide it
-            currentPage++;
-            renderCurrentPage();
-
+        // Listen for changes in orientation
+        pageFlip.on('changeOrientation', (e) => {
+            console.log('Orientation changed to:', e.data);
+            // Force update after orientation change
             setTimeout(() => {
-                // Remove turning animation
-                currentPageElement.classList.remove('turning');
-                isAnimating = false;
-            }, 800); // Match CSS transition time (was 300ms)
-        }
-    }
+                pageFlip.update();
+            }, 300);
+        });
 
-    // Turn to previous page
-    function prevPage() {
-        if (currentPage > 0 && !isAnimating) {
-            isAnimating = true;
+        // Listen for changes in state
+        pageFlip.on('changeState', (e) => {
+            console.log('State changed to:', e.data);
+        });
 
-            // Add reverse turning animation
-            currentPageElement.classList.add('reverse-turning');
-            playPageTurnEffect();
-
-            // Update content immediately but hide it
-            currentPage--;
-            renderCurrentPage();
-
-            setTimeout(() => {
-                // Remove reverse turning animation
-                currentPageElement.classList.remove('reverse-turning');
-                isAnimating = false;
-            }, 800); // Match CSS transition time (was 300ms)
-        }
+        // Update initial page counter
+        const initialPage = window.innerWidth > 768 ? 1 : 2; // First or second page depending on viewport
+        updatePageCounter(initialPage, pageFlip.getPageCount());
     }
 
     // Update page counter text
-    function updatePageCounter() {
-        pageCounter.textContent = `Página ${currentPage + 1} de ${totalPages}`;
+    function updatePageCounter(currentPage, totalPages) {
+        // Adjust page display for the blank page
+        if (currentPage === 1) {
+            pageCounter.textContent = `Portada`;
+        } else {
+            // Subtract 1 from current page for display to account for blank page
+            const displayPage = currentPage - 1;
+            pageCounter.textContent = `Página ${displayPage} de ${totalPages - 1}`;
+        }
     }
 
-    // Play page turn effect animation
-    function playPageTurnEffect() {
-        if (pageTurnEffect) {
-            pageTurnEffect.style.animation = 'none';
-            void pageTurnEffect.offsetWidth; // Trigger reflow
-            pageTurnEffect.style.animation = 'pageTurnEffect 0.8s ease-out forwards';
+    // Initialize StPageFlip
+    initPageFlip();
 
-            // Add a subtle rotation to the book during page turns
-            book.style.transform = 'rotateX(8deg) rotateZ(0.5deg)';
+    // Function to show the book and hide welcome screen
+    function showBook() {
+        welcomeScreen.style.opacity = '0';
+        welcomeScreen.style.transform = 'translateY(-50px)';
 
-            // Return to normal position after animation
+        setTimeout(() => {
+            welcomeScreen.style.display = 'none';
+
+            // Show book container
+            bookContainer.classList.remove('hidden');
+            bookContainer.style.visibility = 'visible';
+            bookContainer.style.opacity = '1';
+
+            // Set initial position explicitly to prevent jumps
+            if (window.innerWidth < 1003) {
+                bookContainer.style.transform = 'translateY(0)';
+            }
+
+            // Show home button
+            homeBtn.classList.remove('hidden');
+            homeBtn.style.visibility = 'visible';
+            homeBtn.style.opacity = '1';
+
+            // Update page flip when becoming visible
+            if (pageFlip) {
+                setTimeout(() => {
+                    pageFlip.update();
+                    // Force redraw to ensure proper rendering on smaller screens
+                    if (window.innerWidth < 1080) {
+                        pageFlip.turnToCurrent();
+                    }
+                }, 100);
+            }
+        }, 800);
+    }
+
+    // Function to go back to welcome screen
+    function showWelcomeScreen() {
+        // Hide the book container and home button
+        bookContainer.style.opacity = '0';
+        homeBtn.style.opacity = '0';
+
+        setTimeout(() => {
+            bookContainer.style.visibility = 'hidden';
+            bookContainer.classList.add('hidden');
+
+            homeBtn.style.visibility = 'hidden';
+            homeBtn.classList.add('hidden');
+
+            // Show welcome screen
+            welcomeScreen.style.display = 'flex';
             setTimeout(() => {
-                book.style.transform = 'rotateX(8deg)';
-            }, 500);
-        }
+                welcomeScreen.style.opacity = '1';
+                welcomeScreen.style.transform = 'translateY(0)';
+            }, 50);
+        }, 500);
     }
 
     // Start reading button click
     if (startBtn) {
-        startBtn.addEventListener('click', function () {
-            welcomeScreen.style.opacity = '0';
-            welcomeScreen.style.transform = 'translateY(-50px)';
-
-            setTimeout(() => {
-                welcomeScreen.style.display = 'none';
-                bookContainer.classList.remove('hidden');
-                bookContainer.style.visibility = 'visible';
-                bookContainer.style.opacity = '1';
-            }, 800);
-        });
+        startBtn.addEventListener('click', showBook);
     } else {
         // If no start button, automatically show the book
-        setTimeout(() => {
-            if (welcomeScreen) {
-                welcomeScreen.style.opacity = '0';
-                welcomeScreen.style.transform = 'translateY(-50px)';
+        setTimeout(showBook, 1000);
+    }
 
-                setTimeout(() => {
-                    welcomeScreen.style.display = 'none';
-                    if (bookContainer) {
-                        bookContainer.classList.remove('hidden');
-                        bookContainer.style.visibility = 'visible';
-                        bookContainer.style.opacity = '1';
-                    }
-                }, 800);
-            }
-        }, 1000);
+    // Home button click handler
+    if (homeBtn) {
+        homeBtn.addEventListener('click', showWelcomeScreen);
     }
 
     // Event listeners for navigation
-    nextBtn.addEventListener('click', nextPage);
-    prevBtn.addEventListener('click', prevPage);
+    prevBtn.addEventListener('click', function () {
+        if (pageFlip) pageFlip.flipPrev('top');
+    });
+
+    nextBtn.addEventListener('click', function () {
+        if (pageFlip) pageFlip.flipNext('top');
+    });
 
     // Keyboard navigation
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight' || e.key === ' ') {
-            nextPage();
-        } else if (e.key === 'ArrowLeft') {
-            prevPage();
+        if (pageFlip) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                pageFlip.flipNext('top');
+            } else if (e.key === 'ArrowLeft') {
+                pageFlip.flipPrev('top');
+            } else if (e.key === 'Escape') {
+                // ESC key to go back to welcome screen
+                showWelcomeScreen();
+            }
         }
     });
 
-    // Swipe gesture support for touch devices
-    let touchStartX = 0;
-    let touchEndX = 0;
-    let touchStartY = 0;
-    let touchEndY = 0;
+    // Handle window resize events to update the book dimensions
+    window.addEventListener('resize', function () {
+        if (pageFlip) {
+            // Reset any transforms that might have been applied
+            bookContainer.style.transition = 'none';
+            bookContainer.style.transform = '';
 
-    document.addEventListener('touchstart', function (e) {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-    }, false);
+            // Update StPageFlip to match the new screen size
+            setTimeout(() => {
+                pageFlip.update();
 
-    document.addEventListener('touchend', function (e) {
-        touchEndX = e.changedTouches[0].screenX;
-        touchEndY = e.changedTouches[0].screenY;
-        handleSwipe();
-    }, false);
+                // Check if we need to add/remove the specific event handlers based on current width
+                if (window.innerWidth < 1003) {
+                    // Reattach specific handlers for small screens if not already attached
+                    const flippingListeners = pageFlip._events.flipping || [];
+                    if (flippingListeners.length === 0) {
+                        pageFlip.on('flipping', (e) => {
+                            bookContainer.style.transition = 'none';
+                            bookContainer.style.transform = 'translateY(0)';
+                        });
+                    }
+                }
 
-    function handleSwipe() {
-        const swipeThreshold = 50;
-        // Calculate horizontal and vertical distance
-        const horizontalDistance = Math.abs(touchEndX - touchStartX);
-        const verticalDistance = Math.abs(touchEndY - touchStartY);
+                // Force redraw on smaller screens to ensure proper centering
+                if (window.innerWidth < 1080) {
+                    pageFlip.turnToCurrent(); // Stay on current page but redraw
+                }
 
-        // Only process as horizontal swipe if movement is more horizontal than vertical
-        if (horizontalDistance > verticalDistance) {
-            if (touchEndX < touchStartX - swipeThreshold) {
-                // Swipe left, go to next page
-                nextPage();
-            } else if (touchEndX > touchStartX + swipeThreshold) {
-                // Swipe right, go to previous page
-                prevPage();
-            }
+                // Restore transition after update
+                setTimeout(() => {
+                    bookContainer.style.transition = 'transform 0.3s ease-out';
+                }, 100);
+            }, 100); // Small delay to ensure DOM updates
         }
-    }
-}); 
+    });
+
+    // Handle orientation changes specifically
+    window.addEventListener('orientationchange', function () {
+        if (pageFlip) {
+            // Wait for orientation change to complete
+            setTimeout(() => {
+                pageFlip.update();
+            }, 200);
+        }
+    });
+});

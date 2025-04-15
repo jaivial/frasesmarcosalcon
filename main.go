@@ -7,64 +7,45 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 )
 
 // Phrase represents a single phrase from the book
 type Phrase struct {
-	Number int
-	Text   string
+	Number int    `json:"number"`
+	Text   string `json:"text"`
 }
 
 // Book represents the entire book data
 type Book struct {
-	Title   string
-	Phrases []Phrase
+	Title   string   `json:"title"`
+	Author  string   `json:"author,omitempty"`
+	Year    string   `json:"year,omitempty"`
+	Phrases []Phrase `json:"poems"`
 }
 
-// extractPhrases parses the markdown content to extract phrases
-func extractPhrases(content string) []Phrase {
-	var phrases []Phrase
-	re := regexp.MustCompile(`## (\d+)\. (.*)`)
-
-	matches := re.FindAllStringSubmatch(content, -1)
-	for _, match := range matches {
-		if len(match) >= 3 {
-			number := 0
-			fmt.Sscanf(match[1], "%d", &number)
-			phrases = append(phrases, Phrase{
-				Number: number,
-				Text:   match[2],
-			})
-		}
-	}
-
-	return phrases
+// TemplateData represents the data passed to the template
+type TemplateData struct {
+	Title  string
+	Author string
+	Year   string
+	Poems  []Phrase
 }
 
-// extractTitle parses the markdown content to extract the title
-func extractTitle(content string) string {
-	re := regexp.MustCompile(`# (.*)`)
-	match := re.FindStringSubmatch(content)
-	if len(match) >= 2 {
-		return match[1]
-	}
-	return "FRASES DE MARCOS ALCON"
-}
-
-// loadBookData loads the book data from the markdown file
-func loadBookData(filePath string) (Book, error) {
+// loadBookDataFromJSON loads the book data from the JSON file
+func loadBookDataFromJSON(filePath string) (Book, error) {
 	var book Book
 
-	// Read the markdown file
+	// Read the JSON file
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return book, err
 	}
 
-	// Extract title and phrases
-	book.Title = extractTitle(string(content))
-	book.Phrases = extractPhrases(string(content))
+	// Parse JSON data
+	err = json.Unmarshal(content, &book)
+	if err != nil {
+		return book, err
+	}
 
 	return book, nil
 }
@@ -77,20 +58,33 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Load book data
-	book, err := loadBookData("../MARKDOWN/poemas_marcos_alcon.md")
+	book, err := loadBookDataFromJSON("static/data/poems.json")
 	if err != nil {
 		http.Error(w, "Failed to load book data: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Pass book data to the template
-	tmpl, err := template.ParseFiles("templates/index.html")
+	// Create template data with proper field mapping
+	templateData := TemplateData{
+		Title:  book.Title,
+		Author: book.Author,
+		Year:   book.Year,
+		Poems:  book.Phrases,
+	}
+
+	// Create template with functions
+	tmpl, err := template.New("index.html").Funcs(template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+	}).ParseFiles("templates/index.html")
+
 	if err != nil {
 		http.Error(w, "Failed to load template: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = tmpl.Execute(w, book)
+	err = tmpl.Execute(w, templateData)
 	if err != nil {
 		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -99,20 +93,33 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func bookHandler(w http.ResponseWriter, r *http.Request) {
 	// Load book data
-	book, err := loadBookData("../MARKDOWN/poemas_marcos_alcon.md")
+	book, err := loadBookDataFromJSON("static/data/poems.json")
 	if err != nil {
 		http.Error(w, "Failed to load book data: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Pass book data to the template
-	tmpl, err := template.ParseFiles("templates/book_single_page.html")
+	// Create template data
+	templateData := TemplateData{
+		Title:  book.Title,
+		Author: book.Author,
+		Year:   book.Year,
+		Poems:  book.Phrases,
+	}
+
+	// Create template with functions
+	tmpl, err := template.New("book_single_page.html").Funcs(template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+	}).ParseFiles("templates/book_single_page.html")
+
 	if err != nil {
 		http.Error(w, "Failed to load template: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = tmpl.Execute(w, book)
+	err = tmpl.Execute(w, templateData)
 	if err != nil {
 		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -121,7 +128,7 @@ func bookHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiPhrasesHandler(w http.ResponseWriter, r *http.Request) {
 	// Load book data
-	book, err := loadBookData("../MARKDOWN/poemas_marcos_alcon.md")
+	book, err := loadBookDataFromJSON("static/data/poems.json")
 	if err != nil {
 		http.Error(w, "Failed to load book data: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -137,10 +144,10 @@ func apiPhrasesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// Check if markdown file exists
-	_, err := os.Stat("../MARKDOWN/poemas_marcos_alcon.md")
+	// Check if JSON file exists
+	_, err := os.Stat("static/data/poems.json")
 	if os.IsNotExist(err) {
-		log.Fatal("Error: Markdown file not found at ../MARKDOWN/poemas_marcos_alcon.md")
+		log.Fatal("Error: JSON file not found at static/data/poems.json")
 	}
 
 	// Set up file server for static files
