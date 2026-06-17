@@ -21,7 +21,7 @@ html, body {
     height: 100%;
     overflow: hidden;
     font-family: 'EB Garamond', 'Times New Roman', serif;
-    background-color: #2c2416;
+    background-color: #1a1a2e;
     color: var(--text-color);
     line-height: 1.5;
 }
@@ -500,391 +500,148 @@ html, body {
     align-items: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 1.2rem;
-    backdrop-filter: blur(5px);
-    pointer-events: auto; /* Re-enable pointer events */
+    pointer-events: auto;
 }
 
 .nav-btn:hover {
     background: rgba(200, 167, 108, 0.4);
-    transform: translateY(-3px);
+    border-color: rgba(200, 167, 108, 0.5);
+    transform: scale(1.1);
 }
 
-.nav-btn:active {
-    transform: translateY(-1px);
+.nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
-.nav-text {
-    background: rgba(43, 36, 22, 0.7);
-    color: #fdf8ed;
-    padding: 5px 15px;
-    border-radius: 20px;
+.nav-btn:disabled:hover {
+    transform: none;
+}
+
+.nav-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+.page-indicator {
     font-family: 'Cinzel', serif;
     font-size: 0.9rem;
-    backdrop-filter: blur(5px);
-    pointer-events: auto; /* Re-enable pointer events */
+    color: rgba(253, 248, 237, 0.8);
+    pointer-events: auto;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
 }
 
-/* Remove all the unnecessary page turning effect styles */
-.page-turn-effect { display: none !important; }
-.play-turn-effect { display: none !important; }
-.blank-page { display: none !important; }
-.gold-loader { display: none !important; }
-.loader-spinner { display: none !important; }
-
-/* Empty keyframes to override existing ones */
-@keyframes pageTurnEffect { 
-    0% { opacity: 0; }
-    100% { opacity: 0; }
+/* Page Flip Animation */
+@keyframes flipRight {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(-180deg); }
 }
 
-@keyframes spin { 
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(0deg); }
+@keyframes flipLeft {
+    0% { transform: rotateY(-180deg); }
+    100% { transform: rotateY(0deg); }
 }
 
-/* Ensure StPageFlip has the right CSS settings */
-.stf__parent {
-    position: relative;
-    display: block;
-    z-index: 1; 
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    overflow: hidden;
+.flipping-forward {
+    animation: flipRight 0.6s ease-in-out forwards;
+    transform-origin: left center;
 }
 
-/* Customize StPageFlip shadow if needed */
-.stf__block {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    perspective: 2000px;
+.flipping-backward {
+    animation: flipLeft 0.6s ease-in-out forwards;
+    transform-origin: right center;
 }
 
-/* Remove all the classes that hide previous animation code to prevent conflicts */
-.page.current-page {
-    display: inherit !important;
-}
-.page.turning-page {
-    display: inherit !important;
-}
-.page.turning-page::before {
-    display: inherit !important;
-}
-.page.turning-page::after {
-    display: inherit !important;
-}
-.page.next-page {
-    display: inherit !important;
-}
-.page-front {
-    display: inherit !important;
-}
-.page-back {
-    display: inherit !important;
-}
-
-/* Page content styles */
-.page-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 5%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--page-color);
-}
-
-/* Page shadow effect */
-.page::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to right, 
-        rgba(0,0,0,0.1) 0%, 
-        transparent 10%, 
-        transparent 90%, 
-        rgba(0,0,0,0.05) 100%);
+/* Loading state */
+.loading {
+    opacity: 0.7;
     pointer-events: none;
-    z-index: 3;
 }
 
-/* Add responsive styles for the book */
-@media (max-width: 1080px) {
-    .book-container {
-        padding: 0;
-        will-change: transform; /* Optimize for animations */
-        transform: translateY(0); /* Ensure initial position is consistent */
-        transform-origin: center center; /* Ensure stable scaling */
-    }
-    
-    .book {
-        width: min(95vw, calc(95vh * 1.4));
-        height: min(95vh, calc(95vw / 1.4));
-        margin: 0 auto;
-    }
-    
-    .stf__parent {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    
-    .stf__block {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    
-    .navigation {
-        bottom: 15px;
-    }
-}
-
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .book {
-        width: calc(100vw - 20px);
-        height: calc(90vh - 100px);
-        max-width: 95%;
-        margin: 0 auto;
+    .nav-btn {
+        width: 40px;
+        height: 40px;
     }
     
-    .phrase {
-        font-size: clamp(0.9rem, 4vw, 1.4rem);
-        padding: 0 15px;
-        max-width: 90%;
-    }
-    
-    .page-number {
-        bottom: 3%;
-    }
-    
-    .decorative-line {
-        left: 6%;
-        right: 6%;
-    }
-    
-    .border-design, .inner-border {
-        top: 3%;
-        left: 3%;
-        right: 3%;
-        bottom: 3%;
-    }
-    
-    .corner-ornament {
-        width: 30px;
-        height: 30px;
+    .nav-btn svg {
+        width: 20px;
+        height: 20px;
     }
     
     .navigation {
         bottom: 10px;
-    }
-    
-    .nav-btn {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .home-button {
-        width: 45px;
-        height: 45px;
-        font-size: 1.2rem;
-        top: 15px;
-        right: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .book {
-        width: calc(100vw - 16px);
-        height: calc(100vh - 80px);
-        max-width: 100%;
+        gap: 15px;
     }
     
     .phrase {
-        font-size: clamp(0.8rem, 3.5vw, 1.2rem);
-        padding: 0 10px;
-        max-width: 95%;
+        padding: 0 15px;
     }
     
-    .page-content {
-        padding: 3%;
-    }
-    
-    .nav-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .nav-text {
-        font-size: 0.8rem;
-        padding: 3px 10px;
-    }
-    
-    .corner-ornament {
-        width: 20px;
-        height: 20px;
+    .phrase::before,
+    .phrase::after {
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
     }
 }
 
-/* Portrait mode adjustments */
-@media (orientation: portrait) {
+/* Print Styles */
+@media print {
+    .navigation,
+    .welcome-screen {
+        display: none !important;
+    }
+    
+    .book-container {
+        display: block;
+        height: auto;
+    }
+    
     .book {
-        width: min(95vw, calc(85vh * 0.7));
-        height: min(85vh, calc(95vw / 0.7));
-        aspect-ratio: 0.7; /* Portrait book aspect ratio */
+        box-shadow: none;
+        width: 100%;
+        height: auto;
     }
     
-    .stf__parent {
-        width: 100% !important;
-        height: 100% !important;
-        aspect-ratio: 0.7;
+    .page {
+        page-break-after: always;
+        box-shadow: none;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn {
+        width: 60px;
+        height: 60px;
     }
     
-    .stf__block {
-        width: 100% !important;
-        height: 100% !important;
-        aspect-ratio: 0.7;
+    .nav-btn:active {
+        background: rgba(200, 167, 108, 0.4);
     }
 }
 
-/* Home button styles */
-.home-button {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(200, 167, 108, 0.2);
-    color: #fdf8ed;
-    border: 2px solid rgba(200, 167, 108, 0.3);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.3rem;
-    backdrop-filter: blur(5px);
-    z-index: 2000;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+/* Keyboard navigation focus states */
+.nav-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
 }
 
-.home-button:hover {
-    background: rgba(200, 167, 108, 0.4);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-}
-
-.home-button:active {
-    transform: translateY(-1px);
-}
-
-/* Hide elements initially */
-.hidden {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-/* Responsive adjustments for home button */
-@media (max-width: 768px) {
-    .home-button {
-        width: 45px;
-        height: 45px;
-        font-size: 1.2rem;
-        top: 15px;
-        right: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .home-button {
-        width: 40px;
-        height: 40px;
-        font-size: 1.1rem;
-        top: 10px;
-        right: 10px;
-    }
-}
-
-/* Fix for jumpy cover turn on small screens */
-@media (max-width: 1003px) {
-    .stf__parent {
-        transform: translateY(0) !important;
-        transform-origin: center center !important;
+/* Accessibility - reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .welcome-screen,
+    .book-container,
+    .nav-btn,
+    .start-btn,
+    .book-btn {
+        transition: none;
     }
     
-    .stf__block {
-        transform: translateY(0) !important;
-        transform-origin: center center !important;
-    }
-
-    /* Ensure consistent book positioning during page flips */
-    .stf__wrapper {
-        transform: none !important;
-        transform-origin: center center !important;
-    }
-
-    /* Stabilize during page turn */
-    .stf__wrapper.stf__wrapper--turn {
-        transform: none !important;
+    .flipping-forward,
+    .flipping-backward {
+        animation: none;
     }
 }
-
-/* Ensure StPageFlip treats all pages the same */
-.stf__item {
-    backface-visibility: hidden;
-    transform-style: preserve-3d;
-    position: absolute;
-    background-color: var(--page-color);
-}
-
-.stf__page {
-    background-color: var(--page-color);
-}
-
-/* Make sure all pages have the same shadow effect */
-.stf__item.--hard {
-    background-color: var(--page-color) !important;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1) !important;
-}
-
-/* Remove any special treatment for different page types */
-.stf__page-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Blank page content */
-.blank-page-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 5%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--page-color);
-}
-
-/* Make sure the hidden blank page still has decorative elements */
-.blank-page-content .border-design,
-.blank-page-content .inner-border,
-.blank-page-content .decorative-line,
-.blank-page-content .corner-ornament {
-    opacity: 0.6; /* Slightly lighter decorative elements */
-} 
