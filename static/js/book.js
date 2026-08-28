@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('hello world 3');
+    console.log("pepe is the best");
+
     // References
     const welcomeScreen = document.getElementById('welcome-screen');
     const startBtn = document.getElementById('start-btn');
