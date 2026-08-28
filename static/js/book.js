@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log("hello from worktree chat 17");
+    console.log("second change from worktree");
 
     // References
     const welcomeScreen = document.getElementById('welcome-screen');
