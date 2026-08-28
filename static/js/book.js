@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log('hello world 3');
+    console.log('i like horses');
 
     // References
     const welcomeScreen = document.getElementById('welcome-screen');
