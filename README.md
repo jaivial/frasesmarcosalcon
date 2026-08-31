@@ -1,3 +1,5 @@
+<!-- pipeline v0.0.2 ok -->
+
 # MarcosGoWeb
 
 <div align="center">
