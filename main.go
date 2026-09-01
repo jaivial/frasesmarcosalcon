@@ -160,7 +160,10 @@ func main() {
 	http.HandleFunc("/api/phrases", apiPhrasesHandler)
 
 	// Start server
-	port := "8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	fmt.Printf("Server started at http://localhost:%s\n", port)
 	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
