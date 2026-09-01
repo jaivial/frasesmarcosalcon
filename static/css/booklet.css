@@ -3,7 +3,8 @@
 :root {
     --primary-color: #5d4a28;
     --accent-color: #c8a76c;
-    --bg-color: #fffdf8;
+    /* Fundo da aplicação (body e tela de boas-vindas) — verde escuro profundo */
+    --bg-color: #1f3a2b;
     --page-color: #fdf8ed;
     --text-color: #2c2416;
     --border-color: #d9c9a3;
@@ -19,7 +20,7 @@
 html, body {
     height: 100%;
     font-family: 'EB Garamond', 'Times New Roman', serif;
-    background-color: #2c2416;
+    background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.5;
     overflow-x: hidden;
@@ -43,7 +44,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #5d4a28 0%, #9c7a3b 100%);
+    background: linear-gradient(135deg, #1f3a2b 0%, #3a6b4a 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
