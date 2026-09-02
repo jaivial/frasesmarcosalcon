@@ -32,6 +32,8 @@ marcosgoweb/
 ├── main.go                 # Main application entry point
 ├── go.mod                  # Go module definition
 ├── install_certbot.sh      # Script for SSL certificate installation
+├── MARKDOWN/               # Source markdown content
+│   └── poemas_marcos_alcon.md # Poems and phrases in markdown
 ├── static/                 # Static assets
 │   ├── css/                # Stylesheet files
 │   │   ├── style.css       # Main stylesheet
@@ -39,6 +41,8 @@ marcosgoweb/
 │   │   └── booklet.css     # Booklet format styles
 │   ├── js/                 # JavaScript files
 │   │   └── book.js         # Book interaction functionality
+│   ├── img/                # Image assets
+│   │   └── foto1.jpg       # Header image
 │   └── data/               # Application data
 │       └── poems.json      # Collection of phrases/poems
 ├── templates/              # HTML templates
@@ -46,6 +50,7 @@ marcosgoweb/
 │   ├── book.html           # Book view template
 │   └── book_single_page.html # Single page view template
 └── server/                 # Server-related files
+    └── go.mod              # Server Go module definition
 ```
 
 ## Installation and Setup
@@ -129,6 +134,8 @@ marcosgoweb/
 ├── main.go                 # Punto de entrada principal de la aplicación
 ├── go.mod                  # Definición del módulo Go
 ├── install_certbot.sh      # Script para la instalación de certificados SSL
+├── MARKDOWN/               # Contenido fuente en markdown
+│   └── poemas_marcos_alcon.md # Poemas y frases en markdown
 ├── static/                 # Activos estáticos
 │   ├── css/                # Archivos de hoja de estilo
 │   │   ├── style.css       # Hoja de estilo principal
@@ -136,6 +143,8 @@ marcosgoweb/
 │   │   └── booklet.css     # Estilos para el formato de folleto
 │   ├── js/                 # Archivos JavaScript
 │   │   └── book.js         # Funcionalidad de interacción del libro
+│   ├── img/                # Recursos de imagen
+│   │   └── foto1.jpg       # Imagen de cabecera
 │   └── data/               # Datos de la aplicación
 │       └── poems.json      # Colección de frases/poemas
 ├── templates/              # Plantillas HTML
@@ -143,6 +152,7 @@ marcosgoweb/
 │   ├── book.html           # Plantilla de vista de libro
 │   └── book_single_page.html # Plantilla de vista de página única
 └── server/                 # Archivos relacionados con el servidor
+    └── go.mod              # Definición del módulo Go del servidor
 ```
 
 ## Instalación y Configuración
