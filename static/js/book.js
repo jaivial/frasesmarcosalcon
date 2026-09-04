@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log("second change from worktree");
     console.log("worktree is working");
     console.log("perros si");
+    console.log('pong');
 
     // References
     const welcomeScreen = document.getElementById('welcome-screen');
