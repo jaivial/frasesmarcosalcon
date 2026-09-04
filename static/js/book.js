@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log("worktree is working");
     console.log("perros si");
     console.log('pong');
+    console.log("hola pelé");
 
     // References
     const welcomeScreen = document.getElementById('welcome-screen');
