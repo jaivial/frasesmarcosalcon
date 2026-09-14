@@ -133,7 +133,7 @@ html, body {
     font-family: 'Cinzel', serif;
     font-size: clamp(0.9rem, 1.5vw, 1.1rem);
     padding: 0.8rem 2.5rem;
-    background: linear-gradient(to right, #c8a76c, #9c7a3b);
+    background: #000;
     color: white;
     border: none;
     border-radius: 50px;
@@ -151,9 +151,9 @@ html, body {
     font-family: 'Cinzel', serif;
     font-size: clamp(0.9rem, 1.5vw, 1.1rem);
     padding: 0.8rem 2.5rem;
-    background: transparent;
-    color: #9c7a3b;
-    border: 2px solid #c8a76c;
+    background: #000;
+    color: white;
+    border: 2px solid #000;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -166,7 +166,8 @@ html, body {
 }
 
 .book-btn:hover {
-    background-color: rgba(200, 167, 108, 0.1);
+    background-color: #333;
+    border-color: #333;
     transform: translateY(-3px);
     box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
 }
@@ -762,9 +763,9 @@ html, body {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: rgba(200, 167, 108, 0.2);
-    color: #fdf8ed;
-    border: 2px solid rgba(200, 167, 108, 0.3);
+    background: #000;
+    color: #ffffff;
+    border: 2px solid #000;
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -780,7 +781,8 @@ html, body {
 }
 
 .home-button:hover {
-    background: rgba(200, 167, 108, 0.4);
+    background: #333;
+    border-color: #333;
     transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
 }

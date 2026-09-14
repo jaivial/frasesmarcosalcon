@@ -473,7 +473,7 @@ template {
 }
 
 .nav-button {
-    background: linear-gradient(to right, #c8a76c, #9c7a3b);
+    background: #000;
     color: white;
     border: none;
     border-radius: 5px;
@@ -492,6 +492,7 @@ template {
 }
 
 .nav-button:hover {
+    background: #333;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
@@ -725,8 +726,8 @@ template {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background-color: var(--primary-color);
-    color: var(--page-color);
+    background-color: #000;
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -739,7 +740,7 @@ template {
 }
 
 .final-button:hover {
-    background-color: var(--accent-color);
+    background-color: #333;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 } 
