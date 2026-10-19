@@ -47,6 +47,7 @@ html, body {
     align-items: center;
     z-index: 9999;
     transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+    overflow-y: auto;
 }
 
 .welcome-content {
@@ -189,6 +190,16 @@ html, body {
 
 .start-btn:hover::before {
     left: 100%;
+}
+
+.welcome-dog-img {
+    display: block;
+    max-width: min(80%, 300px);
+    height: auto;
+    border-radius: 10px;
+    margin: 1rem auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--border-color);
 }
 
 .welcome-ornament {
@@ -703,6 +714,10 @@ html, body {
 }
 
 @media (max-width: 480px) {
+    .welcome-dog-img {
+        max-width: min(60%, 200px);
+    }
+
     .book {
         width: calc(100vw - 16px);
         height: calc(100vh - 80px);
